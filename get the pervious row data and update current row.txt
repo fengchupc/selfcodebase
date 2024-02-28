@@ -1,0 +1,15 @@
+WITH cte AS ( SELECT ROW_NUMBER ( ) OVER ( ORDER BY ID ) AS rn,* FROM FormElements WHERE ElementName LIKE 'Other[0-9]%' ),
+tt AS (
+	SELECT
+		t.ID,
+		cte.ID AS ParentID 
+	FROM
+		( SELECT rn - 1 a, rn, ID, ElementName FROM cte WHERE ElementName LIKE 'Other[0-9]Text' ) t
+		LEFT JOIN cte ON t.a = cte.rn 
+	) UPDATE FormElements 
+	SET FormElements.ParentID = tt.ParentID 
+FROM
+	tt 
+WHERE
+	ElementName LIKE 'Other[0-9]Text' 
+	AND FormElements.ID = tt.ID

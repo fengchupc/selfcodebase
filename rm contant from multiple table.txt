@@ -1,0 +1,29 @@
+DECLARE @tableName nvarchar(255), @columnName nvarchar(255), @sql nvarchar(max)
+
+DECLARE curTables CURSOR STATIC FOR
+    SELECT TABLE_SCHEMA + '.' + TABLE_NAME
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_TYPE = 'BASE TABLE'
+
+OPEN curTables
+SELECT @@CURSOR_ROWS
+FETCH NEXT FROM curTables INTO @tableName
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @sql = ''
+		
+    SELECT @sql = @sql + 'DELETE FROM ' + @tableName + ' WHERE [' + COLUMN_NAME + '] LIKE ''%<script>%'';'
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = PARSENAME(@tableName, 1)
+
+    IF (@sql <> '')
+    BEGIN
+        EXEC (@sql)
+    END
+
+    FETCH NEXT FROM curTables INTO @tableName
+END
+
+CLOSE curTables
+DEALLOCATE curTables
