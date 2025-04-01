@@ -1,6 +1,6 @@
 
 /**
- * From https://gist.github.com/mbijon/1098477/4e245ab3844ddbd0e7c6f9fdf360501517e121cf
+ * To remove the executble tags
  *
  * @param string $data
  */
